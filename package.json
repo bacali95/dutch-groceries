@@ -8,8 +8,8 @@
     "serve": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src/",
-    "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx src/",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx app/",
+    "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx app/",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
