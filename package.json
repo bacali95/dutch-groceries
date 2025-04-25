@@ -2,9 +2,10 @@
   "name": "dutch-groceries",
   "private": true,
   "type": "module",
+  "packageManager": "yarn@4.9.1",
   "scripts": {
     "build": "react-router build",
-    "dev": "react-router dev",
+    "serve": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
@@ -27,5 +28,9 @@
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vite-tsconfig-paths": "^5.1.4"
+  },
+  "volta": {
+    "node": "22.14.0",
+    "yarn": "4.9.1"
   }
 }
