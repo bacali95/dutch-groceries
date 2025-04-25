@@ -22,3 +22,9 @@ yarn-error.log*
 # lock files
 package-lock.json
 yarn.lock 
+
+# React Router
+/.react-router
+
+# Prisma
+/app/generated

@@ -11,5 +11,8 @@ node_modules
 !.yarn/versions
 
 # React Router
-/.react-router/
-/build/
+/.react-router
+/build
+
+# Prisma
+/app/generated

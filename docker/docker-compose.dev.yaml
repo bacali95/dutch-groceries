@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_DB: dutch-groceries
+      POSTGRES_USER: dutch-groceries
+      POSTGRES_PASSWORD: dutch-groceries
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: lucas-sandery
+    ports:
+      - '8080:8080'
+
+volumes:
+  db-data:
+    driver: local

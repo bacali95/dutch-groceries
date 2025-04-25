@@ -4,5 +4,10 @@ import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@prisma/client': './app/generated/prisma/index.d.ts',
+    },
+  },
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 });

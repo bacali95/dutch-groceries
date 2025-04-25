@@ -10,12 +10,15 @@
     "typecheck": "react-router typegen && tsc",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx app/",
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx app/",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "compose": "docker compose -f docker/docker-compose.dev.yaml"
   },
   "dependencies": {
+    "@prisma/client": "^6.6.0",
     "@react-router/node": "^7.5.2",
     "@react-router/serve": "^7.5.2",
     "isbot": "^5.1.17",
+    "prisma": "^6.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.5.2"

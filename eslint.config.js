@@ -23,6 +23,12 @@ export default [
       // configuration files
       'vite.config.ts',
       'tailwind.config.js',
+
+      // React Router
+      '.react-router/**',
+
+      // Prisma
+      'app/generated/prisma/**',
     ],
   },
   {
