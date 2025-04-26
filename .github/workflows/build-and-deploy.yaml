@@ -6,6 +6,7 @@ on:
       - main
     paths-ignore:
       - 'caddy/**'
+      - '.github/workflows/deploy-caddy.yaml'
 
 concurrency: ${{ github.ref }}
 
