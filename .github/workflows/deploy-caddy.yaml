@@ -35,8 +35,8 @@ jobs:
 
       - name: Copy Caddy files to the server
         run: |
-          scp -r caddy dutch-groceries-server:~/
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r caddy dutch-groceries-server:~/
 
       - name: Deploy Caddy
         run: |
-          ssh dutch-groceries -t "cd caddy && docker compose down && docker compose up -d"
+          ssh dutch-groceries-server -t "cd caddy && docker compose down && docker compose up -d"
