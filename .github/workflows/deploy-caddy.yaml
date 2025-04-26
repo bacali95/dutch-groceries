@@ -25,11 +25,12 @@ jobs:
 
       - name: Alter SSH config
         run: |
+          mkdir ~/.ssh
           echo "Host dutch-groceries
             ProxyCommand cloudflared access ssh --hostname %h
             HostName ${{ secrets.SERVER_HOSTNAME }}
             User ${{ secrets.SERVER_USERNAME }}
-          " >> ~/.ssh/config
+          " > ~/.ssh/config
 
       - name: Copy Caddy files to the server
         uses: appleboy/scp-action@v0.1.7
