@@ -13,7 +13,7 @@ NEW_SERVICE_NAME="${NEW_DEPLOYMENT}-app"
 ################## FUNCTIONS #####################
 
 wait_for_health_app() {
-  CONTAINER_NAME="${PROJECT}-${NEW_SERVICE_NAME}-1"
+  CONTAINER_NAME="dutch-groceries-${NEW_SERVICE_NAME}-1"
   TIMEOUT=120
 
   echo "Wait for container '$CONTAINER_NAME' to be healthy for max $TIMEOUT seconds..."
@@ -53,7 +53,7 @@ echo "Pulling new images..."
 docker compose pull
 
 echo "Creating network..."
-docker network create "${PROJECT}-network" || true
+docker network create "dutch-groceries-network" || true
 
 echo "Updating services..."
 docker compose up -d "$NEW_SERVICE_NAME"
@@ -67,7 +67,7 @@ if [ $EXIT_CODE -eq 0 ]; then
   mv "$APP_DIR/$OLD_DEPLOYMENT" "$APP_DIR/$NEW_DEPLOYMENT"
 
   # Connect the new service to the network with the active alias
-  docker network connect --alias "${PROJECT}-active" "${PROJECT}-network" "${PROJECT}-${NEW_SERVICE_NAME}-1"
+  docker network connect --alias "dutch-groceries-active" "dutch-groceries-network" "dutch-groceries-${NEW_SERVICE_NAME}-1"
 
   echo "y" | docker compose rm --stop "$OLD_SERVICE_NAME"
 else

@@ -1,50 +1,24 @@
 services:
   blue-app:
-    image: ghcr.io/technocode-tunisie/${PROJECT}-app:${APP_VERSION}
+    image: ghcr.io/bacali95/dutch-groceries-app:${APP_VERSION}
     restart: always
     environment:
       PORT: 3000
-      PROJECT: ${PROJECT}
-      SESSION_SECRET: ${SESSION_SECRET}
       DATABASE_URL: ${DATABASE_URL}
-      DATABASE_DIRECT_URL: ${DATABASE_DIRECT_URL}
-      REDIS_URL: ${REDIS_URL}
-      GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
-      GOOGLE_STORAGE_ENABLED: true
-      GOOGLE_STORAGE_BUCKET_NAME: ${PROJECT}-files
-      GOOGLE_APPLICATION_CREDENTIALS: /usr/src/app/google-credentials.json
-      IMAGE_KIT_ENABLED: true
-      IMAGE_KIT_ENDPOINT: https://ik.imagekit.io/nanteam/${PROJECT}
-      GA_TRACKING_ID: ${GA_TRACKING_ID}
     healthcheck:
       test: curl -f http://localhost:3000/status
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - ./google-credentials.json:/usr/src/app/google-credentials.json
 
   green-app:
-    image: ghcr.io/technocode-tunisie/${PROJECT}-app:${APP_VERSION}
+    image: ghcr.io/bacali95/dutch-groceries-app:${APP_VERSION}
     restart: always
     environment:
       PORT: 3000
-      PROJECT: ${PROJECT}
-      SESSION_SECRET: ${SESSION_SECRET}
       DATABASE_URL: ${DATABASE_URL}
-      DATABASE_DIRECT_URL: ${DATABASE_DIRECT_URL}
-      REDIS_URL: ${REDIS_URL}
-      GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
-      GOOGLE_STORAGE_ENABLED: true
-      GOOGLE_STORAGE_BUCKET_NAME: ${PROJECT}-files
-      GOOGLE_APPLICATION_CREDENTIALS: /usr/src/app/google-credentials.json
-      IMAGE_KIT_ENABLED: true
-      IMAGE_KIT_ENDPOINT: https://ik.imagekit.io/nanteam/${PROJECT}
-      GA_TRACKING_ID: ${GA_TRACKING_ID}
     healthcheck:
       test: curl -f http://localhost:3000/status
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - ./google-credentials.json:/usr/src/app/google-credentials.json

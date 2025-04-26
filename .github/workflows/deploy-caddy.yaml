@@ -1,0 +1,40 @@
+name: Deploy Caddy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'caddy/**'
+      - '.github/workflows/deploy-caddy.yaml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copy Caddy files to the server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          override: true
+          source: 'caddy/**'
+          target: .
+
+      - name: Deploy Caddy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          script: |
+            cd caddy
+            docker compose down
+            docker compose up -d

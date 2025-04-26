@@ -1,9 +1,6 @@
-# ARG DEPENDENCIES_TAG
+ARG DEPENDENCIES_TAG
 
-# FROM ghcr.io/technocode-tunisie/web-projects-dependencies:$DEPENDENCIES_TAG
-FROM deps:latest
-
-ARG PROJECT
+FROM ghcr.io/bacali95/dutch-groceries-dependencies:$DEPENDENCIES_TAG
 
 WORKDIR /usr/src/app
 

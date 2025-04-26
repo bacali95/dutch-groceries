@@ -13,7 +13,7 @@
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx app/",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
-    "compose": "docker compose -f docker/docker-compose.dev.yaml",
+    "compose": "docker compose -f docker-compose.dev.yaml",
     "release": "standard-version"
   },
   "dependencies": {
