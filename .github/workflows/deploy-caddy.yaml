@@ -18,6 +18,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Cloudflare CLI
+        run: |
+          curl --location --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb 
+          sudo dpkg -i cloudflared.deb
+
+      - name: Alter SSH config
+        run: |
+          echo "Host dutch-groceries
+            ProxyCommand cloudflared access ssh --hostname %h
+            HostName ${{ secrets.SERVER_HOSTNAME }}
+            User ${{ secrets.SERVER_USERNAME }}
+          " >> ~/.ssh/config
+
       - name: Copy Caddy files to the server
         uses: appleboy/scp-action@v0.1.7
         with:
