@@ -26,29 +26,35 @@ jobs:
       - name: Alter SSH config
         run: |
           mkdir ~/.ssh
+          echo "${{ secrets.SERVER_PRIVATE_KEY }}" >> ~/.ssh/id_dutch_groceries
           echo "Host dutch-groceries
             ProxyCommand cloudflared access ssh --hostname %h
             HostName ${{ secrets.SERVER_HOSTNAME }}
             User ${{ secrets.SERVER_USERNAME }}
+            IdentityFile ~/.ssh/id_dutch_groceries
           " > ~/.ssh/config
 
       - name: Copy Caddy files to the server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOSTNAME }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_PRIVATE_KEY }}
-          override: true
-          source: 'caddy/**'
-          target: .
+        run: |
+          scp -r caddy/* dutch-groceries:~/
+        # uses: appleboy/scp-action@v0.1.7
+        # with:
+        #   host: ${{ secrets.SERVER_HOSTNAME }}
+        #   username: ${{ secrets.SERVER_USERNAME }}
+        #   key: ${{ secrets.SERVER_PRIVATE_KEY }}
+        #   override: true
+        #   source: 'caddy/**'
+        #   target: .
 
       - name: Deploy Caddy
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOSTNAME }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_PRIVATE_KEY }}
-          script: |
-            cd caddy
-            docker compose down
-            docker compose up -d
+        run: |
+          ssh dutch-groceries -t "cd caddy && docker compose down && docker compose up -d"
+        # uses: appleboy/ssh-action@v0.1.7
+        # with:
+        #   host: ${{ secrets.SERVER_HOSTNAME }}
+        #   username: ${{ secrets.SERVER_USERNAME }}
+        #   key: ${{ secrets.SERVER_PRIVATE_KEY }}
+        #   script: |
+        #     cd caddy
+        #     docker compose down
+        #     docker compose up -d
