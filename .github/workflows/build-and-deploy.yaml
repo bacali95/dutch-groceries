@@ -118,7 +118,7 @@ jobs:
 
       - name: Copy Caddy files to the server
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
             mkdir dutch-groceries
             rm -rf dutch-groceries/deploy || true
           EOF
@@ -126,7 +126,7 @@ jobs:
 
       - name: Deploy Caddy
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
             cd dutch-groceries
 
             export APP_DIR=$HOME/dutch-groceries
