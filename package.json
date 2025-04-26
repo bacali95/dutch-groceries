@@ -74,6 +74,11 @@
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   },
+  "standard-version": {
+    "skip": {
+      "tag": true
+    }
+  },
   "volta": {
     "node": "22.14.0",
     "yarn": "4.9.1"

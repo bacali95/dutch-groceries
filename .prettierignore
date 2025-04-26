@@ -28,3 +28,5 @@ yarn.lock
 
 # Prisma
 /app/generated
+
+CHANGELOG.md
