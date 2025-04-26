@@ -44,9 +44,6 @@ cd "$APP_DIR" || exit 1
 
 OLD_COMPOSE_FILE=$(readlink -f docker-compose.yaml)
 
-echo "Login to Docker..."
-echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USERNAME" --password-stdin
-
 ln -sf "versions/docker-compose.$APP_VERSION.yaml" docker-compose.yaml
 
 echo "Pulling new images..."
@@ -78,6 +75,4 @@ else
   echo "y" | docker compose rm --stop "$NEW_SERVICE_NAME"
 fi
 
-echo "Logging out to Docker..."
-docker logout ghcr.io
 exit $EXIT_CODE

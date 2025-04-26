@@ -40,4 +40,8 @@ jobs:
 
       - name: Deploy Caddy
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t "cd caddy && docker compose down && docker compose up -d"
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
+            cd caddy
+            docker compose down
+            docker compose up -d
+          EOF

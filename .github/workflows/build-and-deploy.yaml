@@ -100,32 +100,40 @@ jobs:
           build-args: |
             DEPENDENCIES_TAG=${{ hashFiles('yarn.lock') }}
 
-      - name: Copy deployment scripts and files to the server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOSTNAME }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_PRIVATE_KEY }}
-          override: true
-          source: 'deploy/**'
-          target: dutch-groceries
+      - name: Install Cloudflare CLI
+        run: |
+          curl --location --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb 
+          sudo dpkg -i cloudflared.deb
 
-      - name: Deploying new version
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOSTNAME }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_PRIVATE_KEY }}
-          script: |
+      - name: Alter SSH config
+        run: |
+          mkdir ~/.ssh
+          echo "${{ secrets.SERVER_PRIVATE_KEY }}" >> ~/.ssh/id_ed25519
+          echo "Host dutch-groceries-server
+            ProxyCommand cloudflared access ssh --hostname %h
+            HostName ${{ secrets.SERVER_HOSTNAME }}
+            User ${{ secrets.SERVER_USERNAME }}
+          " > ~/.ssh/config
+          chmod 400 ~/.ssh/id_ed25519
+
+      - name: Copy Caddy files to the server
+        run: |
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
+            mkdir dutch-groceries
+            rm -rf dutch-groceries/deploy || true
+          EOF
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r deploy dutch-groceries-server:~/dutch-groceries
+
+      - name: Deploy Caddy
+        run: |
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
             cd dutch-groceries
 
             export APP_DIR=$HOME/dutch-groceries
             export APP_VERSION=${{ steps.setup.outputs.version }}
 
-            export GITHUB_USERNAME=bacali95
-            export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-
             export DATABASE_URL=${{ secrets.DATABASE_URL }}
 
             chmod +x deploy/deploy.sh
             sh deploy/deploy.sh
+          EOF
