@@ -11,8 +11,10 @@
     "typecheck": "react-router typegen && tsc",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx app/",
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx app/",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "compose": "docker compose -f docker/docker-compose.dev.yaml"
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "compose": "docker compose -f docker/docker-compose.dev.yaml",
+    "release": "standard-version"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -65,6 +67,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "react-router-devtools": "^1.1.10",
+    "standard-version": "^9.5.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.8.3",

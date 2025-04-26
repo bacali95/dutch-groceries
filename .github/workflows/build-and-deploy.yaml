@@ -1,0 +1,128 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.ref }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-environment
+        id: setup
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Prettier
+        run: yarn prettier
+
+      - name: Generate Prisma Schema
+        run: yarn prisma generate
+
+      - name: Build
+        run: yarn build
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Dependencies Docker image
+        uses: docker/build-push-action@v5
+        if: steps.setup.outputs.cache-hit != 'true'
+        with:
+          context: .
+          file: docker/Dockerfile.dependencies
+          push: true
+          tags: |
+            ghcr.io/bacali95/dutch-groceries-dependencies:${{ hashFiles('yarn.lock') }}
+            ghcr.io/bacali95/dutch-groceries-dependencies:latest
+
+      - name: Save Build Output
+        uses: actions/cache/save@v4
+        with:
+          path: build
+          key: ${{ steps.setup.outputs.version }}-${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    if: startsWith(github.event.head_commit.message, 'release:')
+    needs: build
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-environment
+        id: setup
+        with:
+          skip-install: 'true'
+
+      - name: Restore Build Output
+        uses: actions/cache/restore@v4
+        with:
+          path: build
+          key: ${{ steps.setup.outputs.version }}-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Server Docker image
+        uses: docker/build-push-action@v3
+        if: startsWith(github.event.head_commit.message, 'release')
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ghcr.io/bacali95/dutch-groceries-app:${{ steps.setup.outputs.version }}
+          build-args: |
+            DEPENDENCIES_TAG=${{ hashFiles('yarn.lock') }}
+
+      - name: Copy deployment scripts and files to the server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          override: true
+          source: 'deploy/**'
+          target: dutch-groceries
+
+      - name: Deploying new version
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          script: |
+            cd dutch-groceries
+
+            export APP_DIR=$HOME/dutch-groceries
+            export APP_VERSION=${{ steps.setup.outputs.version }}
+
+            export GITHUB_USERNAME=bacali95
+            export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+            export DATABASE_URL=${{ secrets.DATABASE_URL }}
+
+            chmod +x deploy/deploy.sh
+            sh deploy/deploy.sh
