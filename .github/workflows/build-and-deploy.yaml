@@ -91,7 +91,7 @@ jobs:
 
       - name: Build and push Server Docker image
         uses: docker/build-push-action@v3
-        if: startsWith(github.event.head_commit.message, 'release')
+        if: startsWith(github.event.head_commit.message, 'chore(release):')
         with:
           context: .
           file: docker/Dockerfile
@@ -118,15 +118,15 @@ jobs:
 
       - name: Copy Caddy files to the server
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
-            mkdir dutch-groceries
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /bin/bash << EOF
+            mkdir -p dutch-groceries
             rm -rf dutch-groceries/deploy || true
           EOF
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r deploy dutch-groceries-server:~/dutch-groceries
 
       - name: Deploy Caddy
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /bin/bash << EOF
             cd dutch-groceries
 
             export APP_DIR=$HOME/dutch-groceries
