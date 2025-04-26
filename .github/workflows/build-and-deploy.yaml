@@ -118,7 +118,7 @@ jobs:
 
       - name: Copy Caddy files to the server
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /bin/bash << EOF
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
             mkdir -p dutch-groceries
             rm -rf dutch-groceries/deploy || true
           EOF
@@ -126,10 +126,10 @@ jobs:
 
       - name: Deploy Caddy
         run: |
-          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /bin/bash << EOF
+          ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
             cd dutch-groceries
 
-            export APP_DIR=$HOME/dutch-groceries
+            export APP_DIR=/home/${{ secrets.SERVER_USERNAME }}/dutch-groceries
             export APP_VERSION=${{ steps.setup.outputs.version }}
 
             export DATABASE_URL=${{ secrets.DATABASE_URL }}
