@@ -32,6 +32,7 @@ jobs:
             HostName ${{ secrets.SERVER_HOSTNAME }}
             User ${{ secrets.SERVER_USERNAME }}
           " > ~/.ssh/config
+          chmod 400 ~/.ssh/id_ed25519
 
       - name: Copy Caddy files to the server
         run: |
