@@ -1,4 +1,3 @@
-import { version } from '../../package.json';
 import { CherryIcon, ShoppingCartIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
@@ -13,8 +12,10 @@ import {
   THEME_COOKIE_NAME,
 } from 'tw-react-components';
 
+import { ToastContextProvider } from '~/client';
 import { getValueFromCookie } from '~/utils';
 
+import { version } from '../../package.json';
 import type { Route } from './+types/layout';
 import { NavUser } from './nav-user';
 
@@ -23,17 +24,17 @@ export function loader({ request }: Route.LoaderArgs) {
     theme: getValueFromCookie<ThemeState>(
       request.headers.get('Cookie') ?? '',
       THEME_COOKIE_NAME,
-      'system'
+      'system',
     ),
     sidebarOpen: getValueFromCookie<boolean>(
       request.headers.get('Cookie') ?? '',
       SIDEBAR_COOKIE_NAME,
-      false
+      false,
     ),
     showIds: getValueFromCookie<boolean>(
       request.headers.get('Cookie') ?? '',
       SHOW_IDS_COOKIE_NAME,
-      false
+      false,
     ),
   };
 }
@@ -80,21 +81,23 @@ export default function Index({ loaderData }: Route.ComponentProps) {
       ),
       basePath: '/',
     }),
-    []
+    [],
   );
 
   return (
-    <LayoutContextProvider theme={loaderData.theme} showIds={loaderData.showIds}>
-      <SidebarContextProvider defaultOpen={loaderData.sidebarOpen}>
-        <Layout
-          className="p-0"
-          sidebarProps={sidebarProps}
-          NavLink={NavLink}
-          useLocation={useLocation}
-        >
-          <Outlet />
-        </Layout>
-      </SidebarContextProvider>
-    </LayoutContextProvider>
+    <ToastContextProvider>
+      <LayoutContextProvider theme={loaderData.theme} showIds={loaderData.showIds}>
+        <SidebarContextProvider defaultOpen={loaderData.sidebarOpen}>
+          <Layout
+            className="p-0"
+            sidebarProps={sidebarProps}
+            NavLink={NavLink}
+            useLocation={useLocation}
+          >
+            <Outlet />
+          </Layout>
+        </SidebarContextProvider>
+      </LayoutContextProvider>
+    </ToastContextProvider>
   );
 }

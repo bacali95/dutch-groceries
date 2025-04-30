@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../app/generated/prisma"
 }
 
@@ -52,9 +52,9 @@ model Product {
 }
 
 model ProductTag {
-  id             Int              @id @default(autoincrement())
-  name           String
-  TagsOnProducts TagsOnProducts[]
+  id       Int              @id @default(autoincrement())
+  name     String
+  products TagsOnProducts[]
 }
 
 model TagsOnProducts {
@@ -67,9 +67,9 @@ model TagsOnProducts {
 }
 
 model ProductImage {
-  id               Int                @id @default(autoincrement())
-  url              String
-  ImagesOnProducts ImagesOnProducts[]
+  id       Int                @id @default(autoincrement())
+  url      String
+  products ImagesOnProducts[]
 }
 
 model ImagesOnProducts {
@@ -82,12 +82,12 @@ model ImagesOnProducts {
 }
 
 model ProductSource {
-  id          Int               @id @default(autoincrement())
-  name        String
-  url         String
-  price       Float?
-  type        ProductSourceType
-  productId   Int
-  product     Product           @relation(fields: [productId], references: [id])
-  GroceryItem GroceryItem[]
+  id           Int               @id @default(autoincrement())
+  name         String
+  url          String
+  price        Float?
+  type         ProductSourceType
+  productId    Int
+  product      Product           @relation(fields: [productId], references: [id])
+  groceryItems GroceryItem[]
 }

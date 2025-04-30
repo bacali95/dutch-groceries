@@ -66,7 +66,7 @@ export const NavUser: FC<{
             </DropdownMenu.SubTrigger>
             <DropdownMenu.Portal>
               <DropdownMenu.SubContent className="text-sm">
-                {(['light', 'dark', 'system'] as const).map(item => (
+                {(['light', 'dark', 'system'] as const).map((item) => (
                   <DropdownMenu.Item
                     key={item}
                     className="capitalize"

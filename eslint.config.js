@@ -55,13 +55,9 @@ export default [
       prettier: prettierPlugin,
     },
     rules: {
+      '@typescript-eslint/no-unused-vars': 'warn',
       'react/react-in-jsx-scope': 'off',
       'prettier/prettier': 'error',
-      'no-unused-vars': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn'],
-      'react/prop-types': 'off',
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
     },
     settings: {
       react: {

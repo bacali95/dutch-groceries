@@ -2,31 +2,29 @@
 
 html,
 body {
-  html {
-    scroll-behavior: smooth;
-    font-family:
-      'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-      'Segoe UI Symbol', 'Noto Color Emoji';
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  scroll-behavior: smooth;
+  font-family:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 
-    @apply text-[13px] 2xl:text-base;
+  @apply text-[13px] 2xl:text-base;
 
+  ::-webkit-scrollbar {
+    @apply h-1 w-1 bg-slate-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 hover:bg-slate-400;
+  }
+
+  &.dark {
     ::-webkit-scrollbar {
-      @apply h-1 w-1 bg-slate-100;
+      @apply bg-slate-900;
     }
 
     ::-webkit-scrollbar-thumb {
-      @apply bg-slate-300 hover:bg-slate-400;
-    }
-
-    &.dark {
-      ::-webkit-scrollbar {
-        @apply bg-slate-900;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        @apply border-slate-900 bg-slate-700 hover:bg-slate-600;
-      }
+      @apply border-slate-900 bg-slate-700 hover:bg-slate-600;
     }
   }
 }

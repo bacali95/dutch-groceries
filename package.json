@@ -38,6 +38,7 @@
     "isbot": "^5.1.17",
     "lucide-react": "^0.503.0",
     "prisma": "^6.6.0",
+    "puppeteer": "^24.7.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.1",

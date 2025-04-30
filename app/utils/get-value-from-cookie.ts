@@ -1,7 +1,7 @@
 export function getValueFromCookie<T extends string | number | boolean | object>(
   cookie: string,
   key: string,
-  _default: T
+  _default: T,
 ): T {
   const transformers = {
     string: (value: string) => String(value),
@@ -14,9 +14,9 @@ export function getValueFromCookie<T extends string | number | boolean | object>
     return transformers[typeof _default as keyof typeof transformers](
       cookie
         .split('; ')
-        .find(row => row.startsWith(key))
+        .find((row) => row.startsWith(key))
         ?.split('=')[1] ??
-        (typeof _default === 'object' ? JSON.stringify(_default) : String(_default))
+        (typeof _default === 'object' ? JSON.stringify(_default) : String(_default)),
     ) as T;
   } catch {
     return _default;
