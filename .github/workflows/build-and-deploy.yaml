@@ -116,16 +116,15 @@ jobs:
           " > ~/.ssh/config
           chmod 400 ~/.ssh/id_ed25519
 
-      - name: Copy Caddy files to the server
+      - name: Deploy App
         run: |
           ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
             mkdir -p dutch-groceries
             rm -rf dutch-groceries/deploy || true
           EOF
+
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r deploy dutch-groceries-server:~/dutch-groceries
 
-      - name: Deploy Caddy
-        run: |
           ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null << EOF
             cd dutch-groceries
 

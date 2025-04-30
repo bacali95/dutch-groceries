@@ -34,12 +34,10 @@ jobs:
           " > ~/.ssh/config
           chmod 400 ~/.ssh/id_ed25519
 
-      - name: Copy Caddy files to the server
+      - name: Deploy Caddy
         run: |
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r caddy dutch-groceries-server:~/
 
-      - name: Deploy Caddy
-        run: |
           ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
             cd caddy
             docker compose down
