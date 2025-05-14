@@ -49,9 +49,6 @@ ln -sf "versions/docker-compose.$APP_VERSION.yaml" docker-compose.yaml
 echo "Pulling new images..."
 docker compose pull
 
-echo "Creating network..."
-docker network create "dutch-groceries-network" || true
-
 echo "Updating services..."
 docker compose up -d "$NEW_SERVICE_NAME"
 
@@ -62,9 +59,6 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "Deployment succeeded, switching traffic to the new app ($NEW_SERVICE_NAME)..."
 
   mv "$APP_DIR/$OLD_DEPLOYMENT" "$APP_DIR/$NEW_DEPLOYMENT"
-
-  # Connect the new service to the network with the active alias
-  docker network connect --alias "dutch-groceries-active" "dutch-groceries-network" "dutch-groceries-${NEW_SERVICE_NAME}-1"
 
   echo "y" | docker compose rm --stop "$OLD_SERVICE_NAME"
 else

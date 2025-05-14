@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'caddy/**'
-      - '.github/workflows/deploy-caddy.yaml'
+      - 'nginx/**'
+      - '.github/workflows/deploy-nginx.yaml'
 
 concurrency: ${{ github.ref }}
 

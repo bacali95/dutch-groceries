@@ -1,0 +1,16 @@
+services:
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - '80:80'
+    volumes:
+      - ./conf.d/:/etc/nginx/conf.d
+      - ../dutch-groceries:/var/www:ro
+    networks:
+      - dutch_groceries_network
+
+networks:
+  dutch_groceries_network:
+    name: dutch-groceries_default
+    external: true

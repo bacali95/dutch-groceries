@@ -1,12 +1,12 @@
-name: Deploy Caddy
+name: Deploy Nginx
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'caddy/**'
-      - '.github/workflows/deploy-caddy.yaml'
+      - 'nginx/**'
+      - '.github/workflows/deploy-nginx.yaml'
 
 jobs:
   deploy:
@@ -34,12 +34,11 @@ jobs:
           " > ~/.ssh/config
           chmod 400 ~/.ssh/id_ed25519
 
-      - name: Deploy Caddy
+      - name: Deploy Nginx
         run: |
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r caddy dutch-groceries-server:~/
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r nginx dutch-groceries-server:~/
 
           ssh dutch-groceries-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -t << EOF
-            cd caddy
-            docker compose down
-            docker compose up -d
+            cd nginx
+            docker compose up -d --force-recreate
           EOF
