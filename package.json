@@ -1,6 +1,6 @@
 {
   "name": "dutch-groceries",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": true,
   "type": "module",
   "packageManager": "yarn@4.9.2",
