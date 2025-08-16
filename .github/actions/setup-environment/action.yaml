@@ -18,7 +18,7 @@ runs:
   steps:
     - name: Set Yarn version
       shell: bash
-      run: yarn set version 4.9.1
+      run: yarn set version 4.9.2
 
     - name: Install NodeJs 24
       uses: actions/setup-node@v4
