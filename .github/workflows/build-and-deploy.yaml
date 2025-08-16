@@ -132,6 +132,9 @@ jobs:
             export APP_VERSION=${{ steps.setup.outputs.version }}
 
             export DATABASE_URL=${{ secrets.DATABASE_URL }}
+            export SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            export CLOUDFLARE_AUDIENCE=${{ secrets.CLOUDFLARE_AUDIENCE }}
+            export CLOUDFLARE_TEAM_DOMAIN=${{ secrets.CLOUDFLARE_TEAM_DOMAIN }}
 
             chmod +x deploy/deploy.sh
             sh deploy/deploy.sh
