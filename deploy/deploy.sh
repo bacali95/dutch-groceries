@@ -10,31 +10,6 @@ OLD_SERVICE_NAME="${OLD_DEPLOYMENT}-app"
 NEW_DEPLOYMENT=$(if [ -f "$APP_DIR/blue" ]; then echo "green"; else echo "blue"; fi)
 NEW_SERVICE_NAME="${NEW_DEPLOYMENT}-app"
 
-################## FUNCTIONS #####################
-
-wait_for_health_app() {
-  CONTAINER_NAME="dutch-groceries-${NEW_SERVICE_NAME}-1"
-  TIMEOUT=120
-
-  echo "Wait for container '$CONTAINER_NAME' to be healthy for max $TIMEOUT seconds..."
-
-  for i in $(seq $TIMEOUT); do
-    STATUS=$(docker inspect -f '{{ .State.Health.Status }}' "$CONTAINER_NAME")
-    echo "Attempt $i: $STATUS"
-
-    if [ "$STATUS" = "healthy" ]; then
-      echo "Container is healthy after ${i} seconds."
-      return 0
-    fi
-
-    sleep 1s
-  done
-
-  return 1
-}
-
-#################################################
-
 echo "Deploying version $APP_VERSION of $NEW_SERVICE_NAME website..."
 
 mkdir -p "$APP_DIR/versions"
@@ -50,9 +25,7 @@ echo "Pulling new images..."
 docker compose pull
 
 echo "Updating services..."
-docker compose up -d "$NEW_SERVICE_NAME"
-
-wait_for_health_app
+docker compose up -d "$NEW_SERVICE_NAME" --wait
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
@@ -63,6 +36,8 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "y" | docker compose rm --stop "$OLD_SERVICE_NAME"
 else
   echo "Deployment failed, rolling back to the previous version ($OLD_COMPOSE_FILE)..."
+
+  docker compose logs "$NEW_SERVICE_NAME"
 
   ln -sf "$OLD_COMPOSE_FILE" docker-compose.yaml
 

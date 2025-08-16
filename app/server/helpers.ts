@@ -1,6 +1,9 @@
 import type { DataTableSorting } from 'tw-react-components';
+import type { BaseContext } from 'typesafe-rpc';
+import { Route } from 'typesafe-rpc/server';
 
 import { type Field, prismaOutput, queryParser, validateFilters } from '~/client';
+import type { PrismaClient } from '~/prisma/client';
 
 export function getPage(request: Request) {
   const searchParams = new URL(request.url).searchParams;
@@ -27,4 +30,12 @@ export function getPrismaFilters(searchParams: URLSearchParams, fields: Field[])
   const filters = queryParser(searchParams, fields);
 
   return prismaOutput(validateFilters(filters));
+}
+
+export type Context = BaseContext & {
+  prisma: PrismaClient;
+};
+
+export function route<Params extends object, ExtraParams = object>() {
+  return new Route<Params, Context, ExtraParams>();
 }

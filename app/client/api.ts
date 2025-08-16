@@ -1,7 +1,5 @@
-import type { ApiSchema } from '~/types';
+import { createRpcClient } from 'typesafe-rpc/client';
 
-import { createApiClient } from './helpers';
+import type { RpcSchema } from '~/server';
 
-export const api = createApiClient<ApiSchema>({
-  product: '/api/products.data',
-});
+export const api = createRpcClient<RpcSchema>('/rpc');

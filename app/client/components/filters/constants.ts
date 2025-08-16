@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 
-import type { Prisma } from '~/generated/prisma';
+import type { Prisma } from '~/prisma/client';
 
 import type { FilterOptionsProps } from './FilterOptions';
 import {

@@ -12,7 +12,7 @@ import {
   useLayoutContext,
 } from 'tw-react-components';
 
-import type { Prisma } from '~/generated/prisma';
+import type { Prisma } from '~/prisma/client';
 
 import {
   PageTemplate,

@@ -2,7 +2,7 @@
 module.exports = {
   printWidth: 100,
   singleQuote: true,
-  importOrder: ['^~/generated/(.*)$', '^~/(.*)', '^[./]'],
+  importOrder: ['^~/prisma/(.*)$', '^~/(.*)', '^[./]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],

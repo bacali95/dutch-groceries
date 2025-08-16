@@ -2,8 +2,6 @@ import { PackageSearchIcon } from 'lucide-react';
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { Block, Flex, Spinner, TextInput } from 'tw-react-components';
 
-import type { ProductSourceType } from '~/generated/prisma';
-
 import {
   PRODUCT_SOURCE_ICONS,
   PRODUCT_SOURCE_LABELS,
@@ -11,6 +9,7 @@ import {
   debounce,
   useApiPromise,
 } from '~/client';
+import type { ProductSourceType } from '~/prisma/client';
 import type { ProductSearchResult } from '~/types';
 
 type ProductOnlineSearchProps = {

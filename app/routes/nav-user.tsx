@@ -12,7 +12,7 @@ import type { FC } from 'react';
 import { Link } from 'react-router';
 import { DropdownMenu, Sidebar, useLayoutContext, useSidebar } from 'tw-react-components';
 
-import type { User } from '~/generated/prisma';
+import type { User } from '~/prisma/client';
 
 export const NavUser: FC<{
   version: string;
@@ -26,7 +26,7 @@ export const NavUser: FC<{
       <DropdownMenu.Trigger asChild>
         <Sidebar.MenuButton
           size="lg"
-          className="h-auto data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-auto"
         >
           <img
             className="h-8 w-8 rounded-lg"

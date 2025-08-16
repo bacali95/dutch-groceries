@@ -15,4 +15,4 @@ node_modules
 /build
 
 # Prisma
-/app/generated
+/.generated

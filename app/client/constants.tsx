@@ -1,7 +1,7 @@
 import { PackageSearchIcon } from 'lucide-react';
 import type { FC } from 'react';
 
-import type { ProductSourceType } from '~/generated/prisma';
+import type { ProductSourceType } from '~/prisma/client';
 
 export const PRODUCT_SOURCE_LABELS: Record<ProductSourceType, string> = {
   MANUAL: 'Manually added',

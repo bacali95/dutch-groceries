@@ -1,5 +1,7 @@
 @import 'tw-react-components/index.css';
 
+@config '../tailwind.config.ts';
+
 html,
 body {
   scroll-behavior: smooth;

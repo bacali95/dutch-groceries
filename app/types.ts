@@ -1,16 +1,4 @@
-import type { ProductSourceType } from './generated/prisma';
-
-export type IApiSchema = {
-  [entity: string]: {
-    [operation: string]: (params: any) => Promise<any>;
-  };
-};
-
-export type ApiSchema = {
-  product: {
-    searchOnline: (params: { search: string }) => Promise<ProductSearchResult[]>;
-  };
-};
+import type { ProductSourceType } from '~/prisma/client';
 
 export type ProductSearchResult = {
   title: string;

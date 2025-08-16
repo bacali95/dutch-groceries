@@ -1,21 +1,24 @@
 import puppeteer from 'puppeteer';
 
-import { ProductSourceType } from '~/generated/prisma';
+import { ProductSourceType } from '~/prisma/client';
+import { route } from '~/server';
 
-import { createEntityApiHandler } from '~/server';
-import type { ApiSchema, ProductSearchResult } from '~/types';
+type ProductSearchResult = {
+  title: string;
+  image: string;
+  price: number;
+  url: string;
+  source: ProductSourceType;
+};
 
-import type { Route } from './+types/products';
-
-export async function action({ request }: Route.ActionArgs) {
-  return createEntityApiHandler<ApiSchema, 'product'>(request, {
-    searchOnline: async ({ search }) => {
-      return Promise.all([scrapeAlbertHeijn(search), scrapeJumbo(search)]).then((results) =>
+export const productHandlers = {
+  searchOnline: route<{ search: string }>().handle<ProductSearchResult[]>(
+    ({ params: { search } }) =>
+      Promise.all([scrapeAlbertHeijn(search), scrapeJumbo(search)]).then((results) =>
         results.flat(),
-      );
-    },
-  });
-}
+      ),
+  ),
+};
 
 async function scrapeAlbertHeijn(search: string): Promise<ProductSearchResult[]> {
   const browser = await puppeteer.launch();
