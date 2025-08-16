@@ -11,12 +11,11 @@ services:
       LOG_LEVEL: debug
       DATABASE_URL: 'postgresql://dutch-groceries:dutch-groceries@db:5432/dutch-groceries?schema=public'
       SESSION_SECRET: secret
-    volumes:
-      - ./dist/files-storage/dutch-groceries:/tmp/dutch-groceries/files-storage
     ports:
       - '3000:3000'
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:17
@@ -38,6 +37,18 @@ services:
     ports:
       - '8080:8080'
 
+  redis:
+    image: bitnami/redis
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis-data:/bitnami/redis/data
+    ports:
+      - '6379:6379'
+
 volumes:
   db-data:
+    driver: local
+  redis-data:
     driver: local

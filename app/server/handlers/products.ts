@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer';
 
 import { ProductSourceType } from '~/prisma/client';
 
-import { route } from '~/server';
+import { route } from '../route';
 
 type ProductSearchResult = {
   title: string;

@@ -1,3 +1,4 @@
+import { sha256 } from 'js-sha256';
 import {
   BrushIcon,
   CheckIcon,
@@ -12,7 +13,11 @@ import type { FC } from 'react';
 import { Link } from 'react-router';
 import { DropdownMenu, Sidebar, useLayoutContext, useSidebar } from 'tw-react-components';
 
-import type { User } from '~/prisma/client';
+import type { Prisma } from '~/prisma/client';
+
+type User = Prisma.UserGetPayload<{
+  omit: { password: true; sessionId: true };
+}>;
 
 export const NavUser: FC<{
   version: string;
@@ -21,6 +26,8 @@ export const NavUser: FC<{
   const { theme, setTheme, showIds, toggleShowIds } = useLayoutContext();
   const { isMobile } = useSidebar();
 
+  const gravatarUrl = `https://gravatar.com/avatar/${sha256(user.email)}`;
+
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
@@ -28,11 +35,7 @@ export const NavUser: FC<{
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-auto"
         >
-          <img
-            className="h-8 w-8 rounded-lg"
-            src={`https://ui-avatars.com/api/?name=${user.name ?? '-'}`}
-            alt={user.name}
-          />
+          <img className="h-8 w-8 rounded-lg" src={gravatarUrl} alt={user.name} />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{user.name}</span>
             <span className="truncate text-xs">{user.email}</span>
@@ -47,11 +50,7 @@ export const NavUser: FC<{
         sideOffset={4}
       >
         <DropdownMenu.Label className="flex items-center gap-2 p-1.5 text-left font-normal">
-          <img
-            className="h-8 w-8 rounded-lg"
-            src={`https://ui-avatars.com/api/?name=${user.name ?? '-'}`}
-            alt={user.name}
-          />
+          <img className="h-8 w-8 rounded-lg" src={gravatarUrl} alt={user.name} />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{user.name}</span>
             <span className="truncate text-xs">{user.email}</span>
@@ -89,7 +88,7 @@ export const NavUser: FC<{
           </DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
-        <Link to="/secure/logout">
+        <Link to="/logout">
           <DropdownMenu.Item className="w-full cursor-pointer">
             <DropdownMenu.Icon icon={LogOutIcon} />
             Logout
