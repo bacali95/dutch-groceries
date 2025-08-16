@@ -16,14 +16,8 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Set Yarn version
-      shell: bash
-      run: yarn set version 4.9.2
-
-    - name: Install NodeJs 24
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
+    - name: Setup volta
+      uses: volta-cli/action@v4
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
