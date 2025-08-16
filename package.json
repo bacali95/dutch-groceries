@@ -1,6 +1,6 @@
 {
   "name": "dutch-groceries",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "private": true,
   "type": "module",
   "packageManager": "yarn@4.9.2",
@@ -14,8 +14,7 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "compose": "docker compose -f docker-compose.dev.yaml",
-    "release": "standard-version",
-    "postinstall": "yarn-berry-deduplicate"
+    "release": "standard-version --commit-all"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -76,8 +75,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.2",
     "vite": "^7.1.2",
-    "vite-tsconfig-paths": "^5.1.4",
-    "yarn-berry-deduplicate": "^6.1.3"
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "standard-version": {
     "skip": {
