@@ -5,11 +5,17 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: ${SESSION_SECRET}
+      CLOUDFLARE_AUDIENCE: ${CLOUDFLARE_AUDIENCE}
+      CLOUDFLARE_TEAM_DOMAIN: ${CLOUDFLARE_TEAM_DOMAIN}
     healthcheck:
       test: curl -f http://localhost:3000/status
       interval: 10s
       timeout: 5s
       retries: 5
+    depends_on:
+      - redis
 
   green-app:
     image: ghcr.io/bacali95/dutch-groceries-app:${APP_VERSION}
@@ -17,8 +23,28 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: ${SESSION_SECRET}
+      CLOUDFLARE_AUDIENCE: ${CLOUDFLARE_AUDIENCE}
+      CLOUDFLARE_TEAM_DOMAIN: ${CLOUDFLARE_TEAM_DOMAIN}
     healthcheck:
       test: curl -f http://localhost:3000/status
       interval: 10s
       timeout: 5s
       retries: 5
+    depends_on:
+      - redis
+
+  redis:
+    image: bitnami/redis
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis-data:/bitnami/redis/data
+    ports:
+      - '6379:6379'
+
+volumes:
+  redis-data:
+    driver: local

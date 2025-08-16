@@ -1,8 +1,21 @@
 import type { Args } from 'typesafe-rpc';
 
-import { assertAuthorized } from '../helpers';
-import type { Context } from '../route';
+import type { Prisma } from '~/prisma/client';
 
-export const hasSession = async <Params, ExtraParams>(args: Args<Params, Context, ExtraParams>) => {
-  return { user: assertAuthorized(args.context.request) };
+import { redirectToLogin } from '../helpers';
+import type { Context } from '../route';
+import { getSession } from '../session';
+
+type User = Prisma.UserGetPayload<{ omit: { password: true; sessionId: true } }>;
+
+export const hasSession = async <Params, ExtraParams>({
+  context: { request },
+}: Args<Params, Context, ExtraParams>) => {
+  const session = await getSession(request.headers.get('Cookie'));
+
+  if (!session.has('user')) {
+    throw redirectToLogin(request);
+  }
+
+  return { user: session.get('user') as User };
 };
