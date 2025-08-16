@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        DEPENDENCIES_TAG: ${DEPENDENCIES_TAG}
+    restart: always
+    environment:
+      ENVIRONMENT: test
+      LOG_LEVEL: debug
+      DATABASE_URL: 'postgresql://dutch-groceries:dutch-groceries@db:5432/dutch-groceries?schema=public'
+      SESSION_SECRET: secret
+    volumes:
+      - ./dist/files-storage/dutch-groceries:/tmp/dutch-groceries/files-storage
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: dutch-groceries
+      POSTGRES_USER: dutch-groceries
+      POSTGRES_PASSWORD: dutch-groceries
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: lucas-sandery
+    ports:
+      - '8080:8080'
+
+volumes:
+  db-data:
+    driver: local
