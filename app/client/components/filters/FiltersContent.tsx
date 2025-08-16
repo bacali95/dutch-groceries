@@ -1,16 +1,22 @@
 import { PlusIcon, XIcon } from 'lucide-react';
 import type { FC } from 'react';
-import { Badge, DropdownMenu, Flex, getDisplayDate } from 'tw-react-components';
+import {
+  Badge,
+  DropdownMenu,
+  Flex,
+  type SelectItem,
+  Spinner,
+  getDisplayDate,
+} from 'tw-react-components';
 
 import { useTimeOffsetContext } from '../../contexts';
+import { useApiPromise } from '../../hooks';
 import { FiltersTriggerWrapper } from './FiltersTriggerWrapper';
 import { operations } from './constants';
-import type { FilterItem, FiltersProps } from './types';
+import type { Field, FilterItem, FiltersProps } from './types';
 
 export const FiltersContent: FC<FiltersProps> = (props) => {
   const { filters, updateFilter, removeFilter } = props;
-
-  const timeOffset = useTimeOffsetContext();
 
   const filtersItems = Object.values(filters)
     .flat()
@@ -21,38 +27,14 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
 
   if (!filtersItems.length) return;
 
-  const getFilterValue = (filter: FilterItem) => {
-    const field = filter.field;
-
-    switch (field.type) {
-      case 'string':
-      case 'number':
-        return filter.value as number | string;
-      case 'date':
-      case 'dateTime':
-        return getDisplayDate(filter.value as Date, {
-          locale: 'en',
-          offset: timeOffset,
-        });
-      case 'relation':
-      case 'relation-multiple':
-        return field.selectables
-          ?.filter((item) => (filter.value as (string | number)[]).includes(item.id))
-          .map((item) => item.label)
-          .join(', ');
-      case 'boolean':
-        return String(filter.value) === 'true' ? 'Yes' : 'No';
-    }
-  };
-
   return (
-    <Flex wrap>
+    <Flex className="text-sm" wrap>
       {filtersItems.map((filter, index) => (
         <Flex
           key={`${filter.field.key}-${index}`}
-          className="h-7 gap-0 divide-x-2 divide-white overflow-hidden rounded-md bg-slate-100 [align-items:stretch] dark:divide-slate-900 dark:bg-slate-700"
+          className="h-full [align-items:stretch] gap-0 divide-x-2 divide-white overflow-hidden rounded-md bg-slate-100 dark:divide-slate-900 dark:bg-slate-700"
         >
-          <Flex className="px-2" align="center">
+          <Flex className="px-2" align="center" fullHeight>
             {filter.field.label}
           </Flex>
           {filter.field.type !== 'boolean' && !filter.field.customQuery && (
@@ -62,6 +44,7 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
                   className="cursor-pointer bg-slate-200 px-2 dark:bg-slate-800"
                   align="center"
                   onClick={() => updateFilter(filter.field.key, { ...filter, not: false })}
+                  fullHeight
                 >
                   Not
                 </Flex>
@@ -71,6 +54,7 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
                   <Flex
                     className="cursor-pointer bg-slate-200 px-2 dark:bg-slate-800"
                     align="center"
+                    fullHeight
                   >
                     {filter.operation && operations[filter.field.type][filter.operation]}
                   </Flex>
@@ -96,25 +80,65 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
             </>
           )}
           <FiltersTriggerWrapper {...props} filter={filter}>
-            <Flex className="cursor-pointer px-2" align="center">
-              {getFilterValue(filter)}
+            <Flex className="cursor-pointer px-2" align="center" fullHeight>
+              <FilterValue filter={filter} loadSelectables={props.loadSelectables} />
             </Flex>
           </FiltersTriggerWrapper>
           <Flex
             className="cursor-pointer px-1 transition-colors hover:bg-red-500 hover:text-white dark:hover:bg-red-600"
             align="center"
+            fullHeight
             onClick={() => removeFilter(filter.field.key)}
           >
             <XIcon className="h-4 w-4" />
           </Flex>
         </Flex>
       ))}
-      <FiltersTriggerWrapper {...props} fields={availableFields}>
-        <Badge
-          className="h-7 w-7 cursor-pointer justify-center rounded-md border border-dashed border-border bg-transparent p-0"
-          prefixIcon={PlusIcon}
-        />
-      </FiltersTriggerWrapper>
+      {availableFields.length > 0 && (
+        <FiltersTriggerWrapper {...props} fields={availableFields}>
+          <Badge
+            className="cursor-pointer justify-center rounded-md border border-dashed"
+            variant="outlined"
+            prefixIcon={PlusIcon}
+          />
+        </FiltersTriggerWrapper>
+      )}
     </Flex>
   );
+};
+
+const FilterValue: FC<{
+  filter: FilterItem;
+  loadSelectables: (field: Field) => Promise<SelectItem<string | number, boolean>[]>;
+}> = ({ filter, loadSelectables }) => {
+  const field = filter.field;
+
+  const timeOffset = useTimeOffsetContext();
+
+  const { data: selectables = [], isLoading } = useApiPromise(
+    loadSelectables,
+    field,
+    field.type !== 'relation' && field.type !== 'relation-multiple',
+  );
+
+  switch (field.type) {
+    case 'string':
+    case 'number':
+      return filter.value as number | string;
+    case 'date':
+    case 'dateTime':
+      return getDisplayDate(filter.value as Date, { offset: timeOffset });
+    case 'relation':
+    case 'relation-multiple':
+      return isLoading ? (
+        <Spinner className="h-4 w-4 bg-transparent" />
+      ) : (
+        selectables
+          .filter((item) => (filter.value as (string | number)[]).includes(item.id))
+          .map((item) => item.label)
+          .join(', ')
+      );
+    case 'boolean':
+      return String(filter.value) === 'true' ? 'Yes' : 'No';
+  }
 };

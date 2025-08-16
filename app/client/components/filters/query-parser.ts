@@ -48,7 +48,7 @@ export function queryParser(query: URLSearchParams, fields: Field[]): Record<str
 
 export function getFilterDefaultOperation(
   field: Field,
-): [typeof Number | typeof String | typeof Date | typeof Boolean, string] {
+): [typeof Number | typeof String | ((value: string | number) => Date) | typeof Boolean, string] {
   switch (field.type) {
     case 'relation':
       return [field.constructor, 'in'];
@@ -58,7 +58,7 @@ export function getFilterDefaultOperation(
       return [Number, 'equals'];
     case 'date':
     case 'dateTime':
-      return [Date, 'gte'];
+      return [(value: string | number) => new Date(value), 'gte'];
     case 'boolean':
       return [String, 'equals'];
     default:

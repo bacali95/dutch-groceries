@@ -11,7 +11,7 @@ export const FiltersTriggerWrapper: FC<
   PropsWithChildren<
     FiltersProps & { filter?: FilterItem; align?: DropdownMenuContentProps['align'] }
   >
-> = ({ filter, fields, align = 'start', updateFilter, children }) => {
+> = ({ filter, fields, align = 'start', updateFilter, loadSelectables, children }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<Field | undefined>(filter?.field);
@@ -28,7 +28,7 @@ export const FiltersTriggerWrapper: FC<
     updateFilter(field, {
       field: selectedField,
       not: false,
-      operation,
+      operation: filter?.operation ?? operation,
       value,
     });
     setOpen(false);
@@ -56,7 +56,12 @@ export const FiltersTriggerWrapper: FC<
             </DropdownMenu.Item>
           ))
         ) : (
-          <FilterOptions value={filter?.value} field={selectedField} onSubmit={onSubmit} />
+          <FilterOptions
+            value={filter?.value}
+            field={selectedField}
+            onSubmit={onSubmit}
+            loadSelectables={loadSelectables}
+          />
         )}
       </DropdownMenu.Content>
     </DropdownMenu>

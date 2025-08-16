@@ -7,9 +7,14 @@ export type FiltersProps = {
   searchParams: string;
   fields: Field[];
   filters: Record<string, FilterItem[]>;
+  outputs: {
+    query: string;
+    prisma: object[];
+  };
   updateFilter: (field: string, filter: FilterItem) => void;
   removeFilter: (field: string) => void;
   clearFilters: () => void;
+  loadSelectables: (field: Field) => Promise<SelectItem<string | number, boolean>[]>;
 };
 
 export type FieldType =
@@ -25,7 +30,10 @@ export type Field = {
   key: string;
   label: string;
   icon?: LucideIcon;
-  selectables?: SelectItem<string | number, boolean>[];
+  selectables?:
+    | SelectItem<string | number, boolean>[]
+    | (() => Promise<SelectItem<string | number, boolean>[]>);
+  cachedSelectables?: SelectItem<string | number, boolean>[];
   transformer?: (query: object) => object;
   customQuery?: (value: Value) => object;
 } & (
@@ -36,7 +44,11 @@ export type Field = {
   | {
       type: 'relation' | 'relation-multiple';
       field: string;
-      constructor: typeof Number | typeof String | typeof Date | typeof Boolean;
+      constructor:
+        | typeof Number
+        | typeof String
+        | ((value: string | number) => Date)
+        | typeof Boolean;
     }
 );
 
