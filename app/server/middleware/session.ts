@@ -17,5 +17,5 @@ export const hasSession = async <Params, ExtraParams>({
     throw redirectToLogin(request);
   }
 
-  return { user: session.get('user') as User };
+  return { user: session.get('user') as User, method: 'basic' };
 };

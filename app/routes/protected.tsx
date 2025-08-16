@@ -14,13 +14,14 @@ import type { Route } from './+types/protected';
 import { NavUser } from './nav-user';
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user } = await orMiddleware(
+  const { user, method } = await orMiddleware(
     hasSession,
     hasCloudflareJwt,
   )({ params: {}, extraParams: {}, context: { request, prisma } });
 
   return {
     user,
+    method: method as 'basic' | 'cloudflare',
     sidebarOpen: getValueFromCookie<boolean>(
       request.headers.get('Cookie') ?? '',
       SIDEBAR_COOKIE_NAME,
@@ -64,7 +65,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
           ],
         },
       ],
-      footer: <NavUser version={version} user={loaderData.user} />,
+      footer: <NavUser version={version} user={loaderData.user} method={loaderData.method} />,
       basePath: '/',
     }),
     [],

@@ -15,9 +15,10 @@ type Credentials = {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get('Cookie'));
-  const returnUrl = new URL(request.url).searchParams.get('returnUrl');
 
   if (session.has('user')) {
+    const returnUrl = new URL(request.url).searchParams.get('returnUrl');
+
     return redirect(returnUrl ?? '/');
   }
 

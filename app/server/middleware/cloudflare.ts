@@ -42,5 +42,5 @@ export const hasCloudflareJwt = async <Params, ExtraParams>({
     throw redirectToLogin(request);
   }
 
-  return { user };
+  return { user, method: 'cloudflare' };
 };

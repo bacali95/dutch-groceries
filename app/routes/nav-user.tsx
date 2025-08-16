@@ -3,6 +3,7 @@ import {
   BrushIcon,
   CheckIcon,
   ChevronsUpDownIcon,
+  CloudIcon,
   HashIcon,
   LogOutIcon,
   MonitorIcon,
@@ -22,7 +23,8 @@ type User = Prisma.UserGetPayload<{
 export const NavUser: FC<{
   version: string;
   user: User;
-}> = ({ version, user }) => {
+  method: 'basic' | 'cloudflare';
+}> = ({ version, user, method }) => {
   const { theme, setTheme, showIds, toggleShowIds } = useLayoutContext();
   const { isMobile } = useSidebar();
 
@@ -88,12 +90,19 @@ export const NavUser: FC<{
           </DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
-        <Link to="/logout">
-          <DropdownMenu.Item className="w-full cursor-pointer">
-            <DropdownMenu.Icon icon={LogOutIcon} />
-            Logout
+        {method === 'basic' ? (
+          <Link to="/logout">
+            <DropdownMenu.Item className="w-full cursor-pointer">
+              <DropdownMenu.Icon icon={LogOutIcon} />
+              Logout
+            </DropdownMenu.Item>
+          </Link>
+        ) : (
+          <DropdownMenu.Item className="w-full cursor-pointer" disabled>
+            <DropdownMenu.Icon icon={CloudIcon} />
+            Cloudflare Access
           </DropdownMenu.Item>
-        </Link>
+        )}
         <DropdownMenu.Separator />
         <DropdownMenu.Item className="py-0.5 text-sm font-semibold" disabled>
           v{version}
