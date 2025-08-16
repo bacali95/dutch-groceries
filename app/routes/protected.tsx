@@ -21,7 +21,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return {
     user,
-    method: method as 'basic' | 'cloudflare',
+    method,
     sidebarOpen: getValueFromCookie<boolean>(
       request.headers.get('Cookie') ?? '',
       SIDEBAR_COOKIE_NAME,

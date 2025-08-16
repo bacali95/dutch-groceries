@@ -16,6 +16,8 @@ import { DropdownMenu, Sidebar, useLayoutContext, useSidebar } from 'tw-react-co
 
 import type { Prisma } from '~/prisma/client';
 
+import type { AuthMethod } from '~/types';
+
 type User = Prisma.UserGetPayload<{
   omit: { password: true; sessionId: true };
 }>;
@@ -23,7 +25,7 @@ type User = Prisma.UserGetPayload<{
 export const NavUser: FC<{
   version: string;
   user: User;
-  method: 'basic' | 'cloudflare';
+  method: AuthMethod;
 }> = ({ version, user, method }) => {
   const { theme, setTheme, showIds, toggleShowIds } = useLayoutContext();
   const { isMobile } = useSidebar();

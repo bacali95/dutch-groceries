@@ -2,6 +2,8 @@ import type { Args } from 'typesafe-rpc';
 
 import type { Prisma } from '~/prisma/client';
 
+import type { AuthMethod } from '~/types';
+
 import { redirectToLogin } from '../helpers';
 import type { Context } from '../route';
 import { getSession } from '../session';
@@ -17,5 +19,5 @@ export const hasSession = async <Params, ExtraParams>({
     throw redirectToLogin(request);
   }
 
-  return { user: session.get('user') as User, method: 'basic' };
+  return { user: session.get('user') as User, method: 'basic' as AuthMethod };
 };

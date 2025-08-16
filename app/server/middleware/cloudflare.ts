@@ -1,6 +1,7 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import type { Args } from 'typesafe-rpc';
 
+import type { AuthMethod } from '~/types';
 import { getValueFromCookie } from '~/utils';
 
 import { config } from '../config';
@@ -42,5 +43,5 @@ export const hasCloudflareJwt = async <Params, ExtraParams>({
     throw redirectToLogin(request);
   }
 
-  return { user, method: 'cloudflare' };
+  return { user, method: 'cloudflare' as AuthMethod };
 };
