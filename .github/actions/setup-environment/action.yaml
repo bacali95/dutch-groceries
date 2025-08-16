@@ -19,11 +19,6 @@ runs:
     - name: Setup volta
       uses: volta-cli/action@v4
 
-    - name: Check node version
-      shell: bash
-      run: |
-        node --version
-
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       shell: bash
