@@ -20,10 +20,10 @@ runs:
       shell: bash
       run: yarn set version 4.9.1
 
-    - name: Install NodeJs 22
+    - name: Install NodeJs 24
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: 24
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
