@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { Dialog, FormDialog } from 'tw-react-components';
 
 import type { Product } from '~/prisma/client';
+
 import type { ProductSearchResult } from '~/types';
 
 import { ProductOnlineSearch } from './ProductOnlineSearch';

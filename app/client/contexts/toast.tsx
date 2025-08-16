@@ -50,7 +50,7 @@ export const ToastContextProvider: FC<PropsWithChildren> = ({ children }) => {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-8 right-8 z-[1000] flex w-96 flex-col gap-2">
+      <div className="fixed right-8 bottom-8 z-[1000] flex w-96 flex-col gap-2">
         {toasts.map(({ id, type, message }) => {
           const Icon = icons[type];
 
@@ -79,7 +79,7 @@ export const ToastContextProvider: FC<PropsWithChildren> = ({ children }) => {
               </div>
               <div className="flex items-center">{message}</div>
               <XIcon
-                className="absolute right-1 top-1 h-6 w-6 cursor-pointer rounded-full p-1 hover:bg-slate-100 dark:hover:bg-slate-600"
+                className="absolute top-1 right-1 h-6 w-6 cursor-pointer rounded-full p-1 hover:bg-slate-100 dark:hover:bg-slate-600"
                 onClick={() => remove(id)}
               />
             </div>

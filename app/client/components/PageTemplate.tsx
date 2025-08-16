@@ -65,7 +65,7 @@ export const PageTemplate: FC<Props> = ({
           {Icon && (
             <Icon
               className={cn(
-                'ml-2 mr-2 h-4 w-4 flex-shrink-0',
+                'mr-2 ml-2 h-4 w-4 flex-shrink-0',
                 breadcrumbs.filter((breadcrumb) => !breadcrumb.hide).length && 'mr-0',
               )}
             />
