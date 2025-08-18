@@ -6,10 +6,11 @@ export default [
   layout('routes/layout.tsx', [
     route('login', 'routes/login.tsx'),
     route('logout', 'routes/logout.tsx'),
-    layout('routes/protected.tsx', [
+    layout('routes/protected.tsx', { id: 'protected' }, [
       index('routes/groceries/index.tsx'),
       route('products', 'routes/products/index.tsx'),
       route('products/new', 'routes/products/product-form/index.tsx'),
+      route('users', 'routes/users/index.tsx'),
     ]),
   ]),
 ] satisfies RouteConfig;

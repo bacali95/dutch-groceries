@@ -1,9 +1,15 @@
-import { compareSync } from 'bcryptjs';
 import { FormProvider, useForm } from 'react-hook-form';
 import { data, redirect, useFetcher } from 'react-router';
-import { Button, Card, Flex, FormInputs, ThemeSelector } from 'tw-react-components';
+import { Block, Flex, ThemeSelector } from 'tw-react-components';
 
-import { commitSession, getSession, prisma } from '~/server';
+import { CloudflareAuthentication, CredentialsAuthentication } from '~/client';
+import {
+  type AuthenticationMethod,
+  authenticate,
+  commitSession,
+  config,
+  getSession,
+} from '~/server';
 
 import { version } from '../../package.json' with { type: 'json' };
 import type { Route } from './+types/login';
@@ -23,7 +29,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 
   return data(
-    { error: session.get('error') },
+    {
+      error: session.get('error'),
+      cloudflareEnabled: config.cloudflare.audience && config.cloudflare.teamDomain,
+    },
     { headers: { 'Set-Cookie': await commitSession(session) } },
   );
 }
@@ -31,71 +40,78 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
   const session = await getSession(request.headers.get('Cookie'));
   const form = await request.formData();
-  const email = form.get('email')?.toString();
-  const password = form.get('password')?.toString();
+  const method = form.get('method')?.toString() as AuthenticationMethod | undefined;
 
-  const user = await prisma.user.findFirst({ where: { email } });
-
-  if (!user || !password || !compareSync(password, user.password)) {
-    session.set('error', 'Invalid username or password');
-
-    return redirect('/login', { headers: { 'Set-Cookie': await commitSession(session) } });
+  if (!method || !(method in authenticate)) {
+    throw new Response('Invalid authentication method', { status: 400 });
   }
 
-  const savedUser = await prisma.user.update({
-    where: { id: user.id },
-    data: { sessionId: session.id },
-    omit: { password: true, sessionId: true },
-  });
-
-  const returnUrl = new URL(request.url).searchParams.get('returnUrl');
-
-  session.set('user', savedUser);
-  session.unset('error');
-
-  return redirect(returnUrl ?? '/', {
-    headers: { 'Set-Cookie': await commitSession(session) },
-  });
+  return authenticate[method](request, form, session);
 }
 
-export default function Index({ loaderData: { error } }: Route.ComponentProps) {
+export default function Index({ loaderData: { cloudflareEnabled, error } }: Route.ComponentProps) {
   const fetcher = useFetcher();
 
   const loginForm = useForm<Credentials>();
 
   return (
-    <Flex className="relative h-screen w-screen bg-white pt-[25dvh] dark:bg-slate-900 dark:text-white">
+    <Flex
+      className="bg-muted min-h-svh gap-6 p-6 md:p-10"
+      direction="column"
+      align="center"
+      justify="center"
+    >
       <ThemeSelector className="absolute top-2 right-2" />
-      <Flex className="mx-8 gap-0" direction="column" align="center" fullWidth>
+      <Flex className="max-w-sm gap-6" direction="column" fullWidth>
         <img
-          className="mb-12 block h-32 max-w-sm dark:[filter:brightness(0)_invert(1)]"
+          className="block h-20 self-center"
           src="/images/logo-only.png"
           alt="Logo"
           loading="lazy"
         />
         <FormProvider {...loginForm}>
-          <Card className="w-full p-4 md:max-w-sm">
-            <fetcher.Form className="flex flex-col items-center gap-3" method="POST">
-              <h1 className="py-4 text-2xl">Login</h1>
-              <FormInputs.Text name="email" placeholder="Email" autoComplete="email" required />
-              <FormInputs.Password
-                name="password"
-                placeholder="Password"
-                autoComplete="username"
-                required
-              />
+          <Flex
+            className="bg-background text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm"
+            direction="column"
+            align="center"
+            fullWidth
+          >
+            <Block
+              className="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 text-center has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6"
+              fullWidth
+            >
+              <Block className="text-xl leading-none font-semibold">Welcome back</Block>
+              <Block className="text-muted-foreground text-sm">
+                {cloudflareEnabled
+                  ? 'Login with your Cloudflare account'
+                  : 'Login with your email and password'}
+              </Block>
+            </Block>
+            <Flex className="gap-6 px-6" direction="column" fullWidth>
+              {cloudflareEnabled && (
+                <>
+                  <CloudflareAuthentication
+                    form={fetcher.Form}
+                    loading={fetcher.state !== 'idle'}
+                  />
+                  <Block
+                    className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t"
+                    fullWidth
+                  >
+                    <span className="bg-background text-muted-foreground relative z-10 px-2">
+                      Or continue with
+                    </span>
+                  </Block>
+                </>
+              )}
+              <CredentialsAuthentication form={fetcher.Form} loading={fetcher.state !== 'idle'} />
               {error && <div className="text-red-400">{error}</div>}
-              <Button
-                className="mx-auto w-fit px-6"
-                type="submit"
-                loading={fetcher.state !== 'idle'}
-              >
-                Login
-              </Button>
-            </fetcher.Form>
-          </Card>
+            </Flex>
+          </Flex>
         </FormProvider>
-        <div className="mt-2 text-xs">{version}</div>
+        <div className="text-muted-foreground self-center text-sm text-balance">
+          Dutch Groceries v{version}
+        </div>
       </Flex>
     </Flex>
   );

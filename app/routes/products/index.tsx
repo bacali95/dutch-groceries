@@ -1,6 +1,6 @@
 import { CherryIcon, EditIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
-import { useFetcher, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import {
   Badge,
   Button,
@@ -10,75 +10,29 @@ import {
   Flex,
   getDisplayDate,
   useLayoutContext,
+  useToast,
 } from 'tw-react-components';
-
-import type { Prisma } from '~/prisma/client';
 
 import {
   PageTemplate,
   RefreshButton,
+  api,
+  useApiPromise,
   useFilters,
+  useMutation,
   usePagination,
   useSorting,
   useTimeOffsetContext,
-  useToastContext,
 } from '~/client';
-import { getPage, getPrismaFilters, getPrismaOrderBy, prisma } from '~/server';
+import type { Product } from '~/types';
 
-import type { Route } from './+types';
-import { getProductFiltersFields, useProductFilterFields } from './product-filter-fields';
+import { useProductFilterFields } from './product-filter-fields';
 
-type Product = Prisma.ProductGetPayload<{
-  include: {
-    tags: { include: { tag: true } };
-    images: { include: { image: true } };
-    sources: true;
-  };
-}>;
-
-export async function loader({ request }: Route.LoaderArgs) {
-  const searchParams = new URL(request.url).searchParams;
-  const page = getPage(request);
-  const orderBy = getPrismaOrderBy(request);
-  const fields = getProductFiltersFields();
-  const where = getPrismaFilters(searchParams, fields);
-
-  const [products, totalItems] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: {
-        tags: { include: { tag: true } },
-        images: { include: { image: true } },
-        sources: true,
-      },
-      skip: 25 * (page ?? 0),
-      take: 25,
-      orderBy,
-    }),
-    prisma.product.count({ where }),
-  ]);
-
-  return { products, totalItems };
-}
-
-export async function action({ request }: Route.ActionArgs) {
-  switch (request.method) {
-    case 'DELETE': {
-      const { id } = await request.json();
-
-      return prisma.product.delete({ where: { id } });
-    }
-  }
-
-  return new Response('Method not allowed', { status: 405 });
-}
-
-export default function Index({ loaderData: { products, totalItems } }: Route.ComponentProps) {
-  const { toast } = useToastContext();
+export default function Index() {
+  const { toast } = useToast();
   const { showIds } = useLayoutContext();
   const timeOffset = useTimeOffsetContext();
   const navigate = useNavigate();
-  const fetcher = useFetcher();
 
   const [deleteDialogState, setDeleteDialogState] = useState<{
     open: boolean;
@@ -89,6 +43,16 @@ export default function Index({ loaderData: { products, totalItems } }: Route.Co
   const fields = useProductFilterFields();
   const filtersProps = useFilters(fields);
   const { sorting, setSorting } = useSorting<Product>();
+
+  const {
+    data: [products, totalItems] = [[], 0],
+    isLoading,
+    refetch,
+  } = useApiPromise(api.product.getPage, {
+    page: currentPage,
+    filters: filtersProps.outputs.prisma,
+    sorting,
+  });
 
   const columns: DataTableColumn<Product>[] = [
     {
@@ -104,9 +68,9 @@ export default function Index({ loaderData: { products, totalItems } }: Route.Co
       render: (product) => (
         <img
           className="h-20 w-20 rounded-lg object-cover"
-          src={product.images[0]?.image.url}
+          src={product.images[0]?.url}
           height={200}
-          alt={product.images[0]?.imageId.toString()}
+          alt={product.images[0]?.id.toString()}
           loading="lazy"
         />
       ),
@@ -144,13 +108,23 @@ export default function Index({ loaderData: { products, totalItems } }: Route.Co
     },
   ];
 
+  const [handleDeleteProduct, isDeleting] = useMutation(async (id: number) => {
+    await api.product.delete({ id });
+
+    toast({
+      variant: 'success',
+      title: 'Success',
+      message: 'Product deleted successfully',
+    });
+  }, refetch);
+
   return (
     <PageTemplate
       icon={CherryIcon}
       title="Products"
       actions={
         <>
-          <RefreshButton />
+          <RefreshButton onClick={() => refetch()} />
           <Button prefixIcon={PlusIcon} onClick={() => navigate('/products/new')} />
         </>
       }
@@ -161,6 +135,7 @@ export default function Index({ loaderData: { products, totalItems } }: Route.Co
       <DataTable
         rows={products}
         columns={columns}
+        isLoading={isLoading}
         sorting={{ sorting, onSortingChange: setSorting }}
         pagination={{ currentPage, setCurrentPage, totalItems }}
         onRowClick={(product) => navigate(`/products/${product.id}`)}
@@ -172,14 +147,11 @@ export default function Index({ loaderData: { products, totalItems } }: Route.Co
           {
             color: 'red',
             icon: Trash2Icon,
-            onClick: ({ id }) =>
+            loading: isDeleting,
+            onClick: (product) =>
               setDeleteDialogState({
                 open: true,
-                onConfirm: async () => {
-                  await fetcher.submit({ id }, { method: 'DELETE', encType: 'application/json' });
-
-                  toast('success', 'Product deleted successfully');
-                },
+                onConfirm: () => handleDeleteProduct(product.id),
               }),
           },
         ]}

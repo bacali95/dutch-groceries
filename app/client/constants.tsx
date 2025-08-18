@@ -1,16 +1,14 @@
 import { PackageSearchIcon } from 'lucide-react';
 import type { FC } from 'react';
 
-import type { ProductSourceType } from '~/prisma/client';
-
-export const PRODUCT_SOURCE_LABELS: Record<ProductSourceType, string> = {
+export const PRODUCT_SOURCE_LABELS: Record<string, string> = {
   MANUAL: 'Manually added',
   ALBERT_HEIJN: 'Albert Heijn',
   JUMBO: 'Jumbo',
   HOOGVLIET: 'Hoogvliet',
 };
 
-export const PRODUCT_SOURCE_ICONS: Record<ProductSourceType, FC<{ className: string }>> = {
+export const PRODUCT_SOURCE_ICONS: Record<string, FC<{ className: string }>> = {
   MANUAL: PackageSearchIcon,
   ALBERT_HEIJN: ({ className }) => (
     <img

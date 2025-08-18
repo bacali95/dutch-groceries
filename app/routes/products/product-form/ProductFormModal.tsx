@@ -3,7 +3,7 @@ import { Dialog, FormDialog } from 'tw-react-components';
 
 import type { Product } from '~/prisma/client';
 
-import type { ProductSearchResult } from '~/types';
+import type { ProductOnlineSearchResult } from '~/types';
 
 import { ProductOnlineSearch } from './ProductOnlineSearch';
 
@@ -16,8 +16,8 @@ export type ProductFormModalProps = {
 export const ProductFormModal = ({ open, onClose, onSubmit }: ProductFormModalProps) => {
   const form = useForm<Product>();
 
-  const onProductSelect = (product: ProductSearchResult) => {
-    form.setValue('name', product.title);
+  const onProductSelect = (product: ProductOnlineSearchResult) => {
+    form.setValue('name', product.name);
   };
 
   return (

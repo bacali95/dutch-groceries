@@ -1,27 +1,55 @@
 import puppeteer from 'puppeteer';
+import type { DataTableSorting } from 'tw-react-components';
 
-import { ProductSourceType } from '~/prisma/client';
+import { StoreKey } from '~/prisma/client';
+import * as Prisma from '~/prisma/models';
 
+import type { Product, ProductOnlineSearchResult } from '~/types';
+
+import { getPrismaOrderBy } from '../helpers';
 import { route } from '../route';
 
-type ProductSearchResult = {
-  title: string;
-  image: string;
-  price: number;
-  url: string;
-  source: ProductSourceType;
-};
-
 export const productHandlers = {
-  searchOnline: route<{ search: string }>().handle<ProductSearchResult[]>(
+  searchOnline: route<{ search: string }>().handle<ProductOnlineSearchResult[]>(
     ({ params: { search } }) =>
       Promise.all([scrapeAlbertHeijn(search), scrapeJumbo(search)]).then((results) =>
         results.flat(),
       ),
   ),
+  getPage: route<{
+    page: number;
+    filters?: Prisma.ProductWhereInput[];
+    sorting?: DataTableSorting<Product>;
+  }>().handle(({ params: { page, filters, sorting }, context: { prisma } }) =>
+    Promise.all([
+      prisma.product.findMany({
+        where: { AND: filters },
+        include: {
+          tags: { include: { tag: true } },
+          images: true,
+          variants: { include: { sources: true } },
+        },
+        skip: 25 * (page ?? 0),
+        take: 25,
+        orderBy: getPrismaOrderBy(sorting),
+      }),
+      prisma.product.count({ where: { AND: filters } }),
+    ]),
+  ),
+  create: route<Prisma.ProductCreateInput | Prisma.ProductUncheckedCreateInput>().handle(
+    ({ params, context: { prisma } }) => prisma.product.create({ data: params }),
+  ),
+  update: route<
+    { id: number } & (Prisma.ProductUpdateInput | Prisma.ProductUncheckedUpdateInput)
+  >().handle(({ params: { id, ...data }, context: { prisma } }) =>
+    prisma.product.update({ where: { id }, data }),
+  ),
+  delete: route<{ id: number }>().handle(({ params: { id }, context: { prisma } }) =>
+    prisma.product.delete({ where: { id } }),
+  ),
 };
 
-async function scrapeAlbertHeijn(search: string): Promise<ProductSearchResult[]> {
+async function scrapeAlbertHeijn(search: string): Promise<ProductOnlineSearchResult[]> {
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
   try {
@@ -44,6 +72,7 @@ async function scrapeAlbertHeijn(search: string): Promise<ProductSearchResult[]>
           id: number;
           title: string;
           link: string;
+          brand: string;
           images: { url: string }[];
           price: { now: number };
         }[];
@@ -55,11 +84,20 @@ async function scrapeAlbertHeijn(search: string): Promise<ProductSearchResult[]>
       .flatMap((card) => card.products)
       .slice(0, 6)
       .map((product) => ({
-        title: product.title,
-        image: product.images.at(-1)?.url ?? '',
-        price: product.price.now,
-        url: product.link,
-        source: ProductSourceType.ALBERT_HEIJN,
+        id: -1,
+        name: product.title,
+        brand: product.brand,
+        images: product.images.map((image) => ({ id: -1, url: image.url, variantId: -1 })),
+        sources: [
+          {
+            id: -1,
+            price: product.price.now,
+            url: product.link,
+            storeKey: StoreKey.ALBERT_HEIJN,
+            variantId: -1,
+          },
+        ],
+        productId: -1,
       }));
   } catch (error) {
     console.error(error);
@@ -70,7 +108,7 @@ async function scrapeAlbertHeijn(search: string): Promise<ProductSearchResult[]>
   }
 }
 
-async function scrapeJumbo(search: string): Promise<ProductSearchResult[]> {
+async function scrapeJumbo(search: string): Promise<ProductOnlineSearchResult[]> {
   const query = `
     query SearchProducts($input: ProductSearchInput!) {
       searchProducts(input: $input) {
@@ -136,10 +174,19 @@ async function scrapeJumbo(search: string): Promise<ProductSearchResult[]> {
   };
 
   return data.data.searchProducts.products.slice(0, 6).map((product) => ({
-    title: product.title,
-    image: product.image,
-    price: product.prices.price,
-    url: product.link,
-    source: ProductSourceType.JUMBO,
+    id: -1,
+    name: product.title,
+    brand: product.brand,
+    images: [{ id: -1, url: product.image, variantId: -1 }],
+    sources: [
+      {
+        id: -1,
+        url: product.link,
+        price: product.prices.price,
+        storeKey: StoreKey.JUMBO,
+        variantId: -1,
+      },
+    ],
+    productId: -1,
   }));
 }

@@ -3,12 +3,13 @@ import { Route } from 'typesafe-rpc/server';
 
 import type { PrismaClient } from '~/prisma/client';
 
-import { hasCloudflareJwt, hasSession } from './middleware';
+import type { User } from '~/types';
 
 export type Context = BaseContext & {
+  user: User;
   prisma: PrismaClient;
 };
 
-export function route<Params extends object, ExtraParams = object>() {
-  return new Route<Params, Context, ExtraParams>().middleware(hasSession, hasCloudflareJwt);
+export function route<Params extends object>() {
+  return new Route<Params, Context>();
 }

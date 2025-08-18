@@ -1,17 +1,32 @@
-import type { DataTableSorting } from 'tw-react-components';
+import type { DataTableSorting, Paths } from 'tw-react-components';
 
 export function getPrismaOrderBy<T>(
-  request: Request | URLSearchParams,
-  field?: string,
-  direction?: DataTableSorting<T>['direction'],
+  orderBy: Request | URLSearchParams | DataTableSorting<T> | undefined,
+  defaultField: Paths<T> = 'id' as Paths<T>,
+  defaultDirection: DataTableSorting<T>['direction'] = 'asc',
 ) {
-  const searchParams = request instanceof Request ? new URL(request.url).searchParams : request;
+  const { field, direction } = (() => {
+    if (orderBy instanceof Request) {
+      const searchParams = new URL(orderBy.url).searchParams;
 
-  return (searchParams.get('sortBy') ?? field ?? 'id')
+      return {
+        field: searchParams.get('sortBy') ?? defaultField,
+        direction: searchParams.get('sortDirection') ?? defaultDirection,
+      };
+    }
+
+    if (orderBy instanceof URLSearchParams) {
+      return {
+        field: orderBy.get('sortBy') ?? defaultField,
+        direction: orderBy.get('sortDirection') ?? defaultDirection,
+      };
+    }
+
+    return orderBy ?? { field: defaultField, direction: defaultDirection };
+  })();
+
+  return field
     .split('.')
     .reverse()
-    .reduce<any>(
-      (prev, curr) => ({ [curr]: prev }),
-      searchParams.get('sortDirection') ?? direction ?? 'asc',
-    );
+    .reduce<any>((prev, curr) => ({ [curr]: prev }), direction);
 }

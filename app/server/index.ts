@@ -1,5 +1,6 @@
+export * from './authentication';
 export * from './route';
 export * from './prisma';
-export * from './session';
 export * from './helpers';
 export * from './handlers';
+export * from './config';

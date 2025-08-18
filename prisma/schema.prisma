@@ -9,54 +9,124 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ProductSourceType {
-  MANUAL
+//
+// ENUMS
+//
+enum Unit {
+  PCS
+  GRAM
+  KG
+  ML
+  L
+  PACK
+  BAG
+}
+
+enum StoreKey {
   ALBERT_HEIJN
-  HOOGVLIET
   JUMBO
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
+//
+// USERS & LISTS
+//
 model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String        @unique
-  password     String
-  sessionId    String?
-  groceryItems GroceryItem[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  sessionId String?
+  role      UserRole @default(USER)
+
+  lists       UsersOnLists[]
+  addedItems  GroceryItem[]  @relation("AddedItems")
+  boughtItems GroceryItem[]  @relation("BoughtItems")
 }
 
+model GroceryList {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users UsersOnLists[]
+  items GroceryItem[]
+}
+
+model UsersOnLists {
+  role   String? // e.g. "owner", "editor", "viewer"
+  userId Int
+  user   User        @relation(fields: [userId], references: [id])
+  listId Int
+  list   GroceryList @relation(fields: [listId], references: [id])
+
+  @@id([userId, listId])
+}
+
+//
+// GROCERY ITEMS
+//
 model GroceryItem {
-  id           Int            @id @default(autoincrement())
-  quantity     Float
-  unit         String
-  price        Float?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  boughtAt     DateTime?
-  boughtFromId Int?
-  boughtFrom   ProductSource? @relation(fields: [boughtFromId], references: [id])
-  boughtById   Int?
-  boughtBy     User?          @relation(fields: [boughtById], references: [id])
-  productId    Int
-  product      Product        @relation(fields: [productId], references: [id])
+  id        Int         @id @default(autoincrement())
+  listId    Int
+  list      GroceryList @relation(fields: [listId], references: [id])
+  productId Int
+  product   Product     @relation(fields: [productId], references: [id])
+
+  // optional: user can specify a preferred variant (brand)
+  variantId Int?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  quantity Float
+  unit     Unit
+  price    Float?
+
+  checkedOff Boolean @default(false)
+  notes      String?
+
+  addedById  Int?
+  addedBy    User? @relation("AddedItems", fields: [addedById], references: [id])
+  boughtById Int?
+  boughtBy   User? @relation("BoughtItems", fields: [boughtById], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  boughtAt  DateTime?
 }
 
+//
+// PRODUCTS
+//
 model Product {
-  id           Int                @id @default(autoincrement())
-  name         String
-  otherNames   String[]
-  description  String
+  id          Int      @id @default(autoincrement())
+  name        String // generic: "Milk 1L"
+  otherNames  String[]
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   tags         TagsOnProducts[]
-  images       ImagesOnProducts[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  sources      ProductSource[]
+  images       ProductImage[]
+  variants     ProductVariant[]
   groceryItems GroceryItem[]
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model ProductTag {
   id       Int              @id @default(autoincrement())
   name     String
+  type     String? // e.g. "category", "diet", "allergen"
   products TagsOnProducts[]
 }
 
@@ -69,28 +139,30 @@ model TagsOnProducts {
   @@id([productId, tagId])
 }
 
-model ProductImage {
-  id       Int                @id @default(autoincrement())
-  url      String
-  products ImagesOnProducts[]
-}
-
-model ImagesOnProducts {
-  productId Int
-  imageId   Int
-  product   Product      @relation(fields: [productId], references: [id])
-  image     ProductImage @relation(fields: [imageId], references: [id])
-
-  @@id([productId, imageId])
-}
-
 model ProductSource {
-  id           Int               @id @default(autoincrement())
-  name         String
-  url          String
-  price        Float?
-  type         ProductSourceType
-  productId    Int
-  product      Product           @relation(fields: [productId], references: [id])
+  id        Int            @id @default(autoincrement())
+  url       String?
+  price     Float?
+  storeKey  StoreKey
+  variantId Int
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model ProductVariant {
+  id        Int     @id @default(autoincrement())
+  name      String // e.g. "Albert Heijn Halfvolle Melk"
+  brand     String? // e.g. "Campina", "Albert Heijn"
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  images       ProductVariantImage[]
+  sources      ProductSource[]
   groceryItems GroceryItem[]
+}
+
+model ProductVariantImage {
+  id        Int            @id @default(autoincrement())
+  url       String
+  variantId Int
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
 }

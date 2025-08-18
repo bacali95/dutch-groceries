@@ -2,7 +2,7 @@ import { PackageSearchIcon } from 'lucide-react';
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { Block, Flex, Spinner, TextInput } from 'tw-react-components';
 
-import type { ProductSourceType } from '~/prisma/client';
+import type { StoreKey } from '~/prisma/enums';
 
 import {
   PRODUCT_SOURCE_ICONS,
@@ -11,10 +11,10 @@ import {
   debounce,
   useApiPromise,
 } from '~/client';
-import type { ProductSearchResult } from '~/types';
+import type { ProductOnlineSearchResult } from '~/types';
 
 type ProductOnlineSearchProps = {
-  onSelect: (product: ProductSearchResult) => void;
+  onSelect: (product: ProductOnlineSearchResult) => void;
 };
 
 export const ProductOnlineSearch: FC<ProductOnlineSearchProps> = ({}) => {
@@ -26,14 +26,14 @@ export const ProductOnlineSearch: FC<ProductOnlineSearchProps> = ({}) => {
     () =>
       data?.reduce(
         (acc, product) => {
-          const source = product.source;
-
-          acc[source] ??= [];
-          acc[source].push(product);
+          for (const source of product.sources) {
+            acc[source.storeKey] ??= [];
+            acc[source.storeKey].push(product);
+          }
 
           return acc;
         },
-        {} as Record<ProductSourceType, ProductSearchResult[]>,
+        {} as Record<string, ProductOnlineSearchResult[]>,
       ) ?? {},
     [data],
   );
@@ -47,13 +47,11 @@ export const ProductOnlineSearch: FC<ProductOnlineSearchProps> = ({}) => {
   return (
     <Flex className="flex-1 gap-4" direction="column" fullHeight>
       <TextInput
+        className="w-1/3"
         name="search"
         label="Search"
-        onChange={debounce((e) => setSearch(e.target.value), 200)}
+        onChange={debounce((e) => setSearch(e.target.value), 500)}
         suffixIcon={PackageSearchIcon}
-        onSuffixIconClick={() => {
-          console.log('clicked');
-        }}
       />
       {!data?.length || isLoading ? (
         <Flex
@@ -74,7 +72,7 @@ export const ProductOnlineSearch: FC<ProductOnlineSearchProps> = ({}) => {
         </Flex>
       ) : (
         <Flex className="gap-8" direction="column">
-          {(Object.entries(groupedData) as [ProductSourceType, ProductSearchResult[]][]).map(
+          {(Object.entries(groupedData) as [StoreKey, ProductOnlineSearchResult[]][]).map(
             ([source, products]) => {
               const Icon = PRODUCT_SOURCE_ICONS[source];
 
@@ -95,10 +93,10 @@ export const ProductOnlineSearch: FC<ProductOnlineSearchProps> = ({}) => {
                       >
                         <img
                           className="h-32 w-32 rounded-md"
-                          src={product.image}
-                          alt={product.title}
+                          src={product.images[0].url}
+                          alt={product.name}
                         />
-                        <span className="text-center text-sm">{product.title}</span>
+                        <span className="text-center text-sm">{product.name}</span>
                       </Flex>
                     ))}
                   </Block>
