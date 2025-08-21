@@ -41,7 +41,7 @@ export const FiltersTriggerWrapper: FC<
       <DropdownMenu.Trigger asChild onClick={() => setOpen(true)}>
         {children}
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content className="min-w-44 overflow-visible" align={align} ref={contentRef}>
+      <DropdownMenu.Content className="min-w-36 overflow-visible" align={align} ref={contentRef}>
         {!FilterOptions ? (
           fields.map((field) => (
             <DropdownMenu.Item

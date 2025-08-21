@@ -6,7 +6,13 @@ import type { AuthenticationProps } from '.';
 export const CloudflareAuthentication: FC<AuthenticationProps> = ({ form: Form, loading }) => (
   <Form className="w-full" method="POST">
     <input type="hidden" name="method" value="cloudflare" />
-    <Button className="w-full justify-center" type="submit" loading={loading}>
+    <Button
+      className="w-full justify-center"
+      variant="outlined"
+      color="primary"
+      type="submit"
+      loading={loading}
+    >
       <CloudflareIcon />
       Login with Cloudflare
     </Button>

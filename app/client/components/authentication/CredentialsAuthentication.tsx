@@ -14,7 +14,7 @@ export const CredentialsAuthentication: FC<AuthenticationProps> = ({ form: Form,
     />
     <FormInputs.Password name="password" label="Password" autoComplete="username" required />
     <input type="hidden" name="method" value="credentials" />
-    <Button className="w-full justify-center" type="submit" loading={loading}>
+    <Button className="w-full justify-center" color="primary" type="submit" loading={loading}>
       Login
     </Button>
   </Form>

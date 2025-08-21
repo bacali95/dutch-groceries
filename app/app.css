@@ -10,8 +10,6 @@ body {
     'Segoe UI Symbol', 'Noto Color Emoji';
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 
-  @apply text-[13px] 2xl:text-base;
-
   ::-webkit-scrollbar {
     @apply h-1 w-1 bg-slate-100;
   }

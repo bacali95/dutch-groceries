@@ -28,20 +28,20 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
   if (!filtersItems.length) return;
 
   return (
-    <Flex className="text-sm" wrap>
+    <Flex className="h-8" wrap>
       {filtersItems.map((filter, index) => (
         <Flex
           key={`${filter.field.key}-${index}`}
-          className="h-full [align-items:stretch] gap-0 divide-x-2 divide-white overflow-hidden rounded-md bg-slate-100 dark:divide-slate-900 dark:bg-slate-700"
+          className="h-full items-stretch gap-0 divide-x-2 divide-white overflow-hidden rounded-md bg-slate-100 dark:divide-slate-900 dark:bg-slate-700"
         >
-          <Flex className="px-2" align="center" fullHeight>
+          <Flex className="px-3" align="center" fullHeight>
             {filter.field.label}
           </Flex>
           {filter.field.type !== 'boolean' && !filter.field.customQuery && (
             <>
               {filter.not && (
                 <Flex
-                  className="cursor-pointer bg-slate-200 px-2 dark:bg-slate-800"
+                  className="cursor-pointer bg-slate-200 px-3 dark:bg-slate-800"
                   align="center"
                   onClick={() => updateFilter(filter.field.key, { ...filter, not: false })}
                   fullHeight
@@ -52,14 +52,14 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
               <DropdownMenu>
                 <DropdownMenu.Trigger asChild>
                   <Flex
-                    className="cursor-pointer bg-slate-200 px-2 dark:bg-slate-800"
+                    className="cursor-pointer bg-slate-200 px-3 dark:bg-slate-800"
                     align="center"
                     fullHeight
                   >
                     {filter.operation && operations[filter.field.type][filter.operation]}
                   </Flex>
                 </DropdownMenu.Trigger>
-                <DropdownMenu.Content className="w-32" align="start">
+                <DropdownMenu.Content className="min-w-36" align="start">
                   {Object.entries(operations[filter.field.type])
                     .filter(([op]) => !(filter.not && op === 'not'))
                     .map(([op, opLabel]) => (
@@ -80,12 +80,12 @@ export const FiltersContent: FC<FiltersProps> = (props) => {
             </>
           )}
           <FiltersTriggerWrapper {...props} filter={filter}>
-            <Flex className="cursor-pointer px-2" align="center" fullHeight>
+            <Flex className="cursor-pointer px-3" align="center" fullHeight>
               <FilterValue filter={filter} loadSelectables={props.loadSelectables} />
             </Flex>
           </FiltersTriggerWrapper>
           <Flex
-            className="cursor-pointer px-1 transition-colors hover:bg-red-500 hover:text-white dark:hover:bg-red-600"
+            className="cursor-pointer px-2 transition-colors hover:bg-red-500 hover:text-white dark:hover:bg-red-600"
             align="center"
             fullHeight
             onClick={() => removeFilter(filter.field.key)}

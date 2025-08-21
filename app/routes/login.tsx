@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { data, redirect, useFetcher } from 'react-router';
-import { Block, Flex, ThemeSelector } from 'tw-react-components';
+import { Block, Card, Flex, ThemeSelector } from 'tw-react-components';
 
 import { CloudflareAuthentication, CredentialsAuthentication } from '~/client';
 import {
@@ -70,44 +70,38 @@ export default function Index({ loaderData: { cloudflareEnabled, error } }: Rout
           loading="lazy"
         />
         <FormProvider {...loginForm}>
-          <Flex
-            className="bg-background text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm"
-            direction="column"
-            align="center"
-            fullWidth
-          >
-            <Block
-              className="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 text-center has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6"
-              fullWidth
-            >
-              <Block className="text-xl leading-none font-semibold">Welcome back</Block>
-              <Block className="text-muted-foreground text-sm">
+          <Card className="bg-background w-full">
+            <Card.Header className="text-center">
+              <Card.Title>Welcome back</Card.Title>
+              <Card.Description>
                 {cloudflareEnabled
                   ? 'Login with your Cloudflare account'
                   : 'Login with your email and password'}
-              </Block>
-            </Block>
-            <Flex className="gap-6 px-6" direction="column" fullWidth>
-              {cloudflareEnabled && (
-                <>
-                  <CloudflareAuthentication
-                    form={fetcher.Form}
-                    loading={fetcher.state !== 'idle'}
-                  />
-                  <Block
-                    className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t"
-                    fullWidth
-                  >
-                    <span className="bg-background text-muted-foreground relative z-10 px-2">
-                      Or continue with
-                    </span>
-                  </Block>
-                </>
-              )}
-              <CredentialsAuthentication form={fetcher.Form} loading={fetcher.state !== 'idle'} />
-              {error && <div className="text-red-400">{error}</div>}
-            </Flex>
-          </Flex>
+              </Card.Description>
+            </Card.Header>
+            <Card.Content>
+              <Flex className="gap-4" direction="column" align="center">
+                {cloudflareEnabled && (
+                  <>
+                    <CloudflareAuthentication
+                      form={fetcher.Form}
+                      loading={fetcher.state !== 'idle'}
+                    />
+                    <Block
+                      className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t"
+                      fullWidth
+                    >
+                      <span className="bg-background text-muted-foreground relative z-10 px-2">
+                        Or continue with
+                      </span>
+                    </Block>
+                  </>
+                )}
+                <CredentialsAuthentication form={fetcher.Form} loading={fetcher.state !== 'idle'} />
+                {error && <div className="text-sm text-red-400">{error}</div>}
+              </Flex>
+            </Card.Content>
+          </Card>
         </FormProvider>
         <div className="text-muted-foreground self-center text-sm text-balance">
           Dutch Groceries v{version}

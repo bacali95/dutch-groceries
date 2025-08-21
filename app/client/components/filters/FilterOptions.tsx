@@ -1,15 +1,7 @@
-import { CheckIcon } from 'lucide-react';
+import { ArrowRightIcon } from 'lucide-react';
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
-import {
-  Button,
-  DateTimeInput,
-  DropdownMenu,
-  Flex,
-  NumberInput,
-  type SelectItem,
-  TextInput,
-} from 'tw-react-components';
+import { DateTimeInput, DropdownMenu, type SelectItem, TextInput } from 'tw-react-components';
 
 import { useApiPromise } from '../../hooks';
 import { getFilterDefaultOperation } from './query-parser';
@@ -22,7 +14,7 @@ export type FilterOptionsProps = {
   loadSelectables: (field: Field) => Promise<SelectItem<string | number, boolean>[]>;
 };
 
-export const StringFilterOptions: FC<FilterOptionsProps> = ({ value, field, onSubmit }) => {
+export const TextFilterOptions: FC<FilterOptionsProps> = ({ value, field, onSubmit }) => {
   const [search, setSearch] = useState<string>(value ? String(value) : '');
 
   const submit = () => {
@@ -39,50 +31,15 @@ export const StringFilterOptions: FC<FilterOptionsProps> = ({ value, field, onSu
   };
 
   return (
-    <Flex className="gap-1" align="center">
-      <TextInput
-        autoFocus
-        value={search}
-        placeholder={field.label}
-        onChange={(event) => setSearch(event.target.value)}
-        onKeyDown={(event) => event.key === 'Enter' && submit()}
-      />
-      <Button className="h-7 w-7" color="green" prefixIcon={CheckIcon} onClick={submit} />
-    </Flex>
-  );
-};
-
-export const NumberFilterOptions: FC<FilterOptionsProps> = ({
-  field,
-  value: initialValue,
-  onSubmit,
-}) => {
-  const [value, setValue] = useState<string>(initialValue ? String(initialValue) : '');
-
-  const submit = () => {
-    const [constructor] = getFilterDefaultOperation(field);
-
-    onSubmit(
-      field.key,
-      !value
-        ? null
-        : field.type === 'relation' || field.type === 'relation-multiple'
-          ? value.split(',').map((item) => constructor(item))
-          : constructor(value),
-    );
-  };
-
-  return (
-    <Flex className="gap-1">
-      <NumberInput
-        autoFocus
-        value={value}
-        placeholder={field.label}
-        onChange={(event) => setValue(event.target.value)}
-        onKeyDown={(event) => event.key === 'Enter' && submit()}
-      />
-      <Button className="h-7 w-7" color="green" prefixIcon={CheckIcon} onClick={submit} />
-    </Flex>
+    <TextInput
+      autoFocus
+      value={search}
+      placeholder={field.label}
+      suffixIcon={ArrowRightIcon}
+      onSuffixIconClick={submit}
+      onChange={(event) => setSearch(event.target.value)}
+      onKeyDown={(event) => event.key === 'Enter' && submit()}
+    />
   );
 };
 

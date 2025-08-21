@@ -4682,7 +4682,7 @@ __metadata:
     tailwindcss: "npm:^4.1.12"
     tailwindcss-animate: "npm:^1.0.7"
     tsx: "npm:^4.20.4"
-    tw-react-components: "npm:^0.0.191"
+    tw-react-components: "npm:^0.0.192"
     typesafe-rpc: "npm:^0.0.8"
     typescript: "npm:^5.9.2"
     vite: "npm:^7.1.3"
@@ -9842,10 +9842,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tw-react-components@npm:^0.0.191":
-  version: 0.0.191
-  resolution: "tw-react-components@npm:0.0.191"
-  checksum: 10c0/a917770b48e884d5cee58758fdadac840e0b595af1a4585d1ea61ce727c5e3ff688aa8dd702d358f02782c0160db541ad888e93bf3b09ec2b46bfe45e4e0c9b5
+"tw-react-components@npm:^0.0.192":
+  version: 0.0.192
+  resolution: "tw-react-components@npm:0.0.192"
+  checksum: 10c0/d42685129a396edc1b9fcbcc1742f5e36540304c3ec419181df513ffab20c023cbfc7fe4cf0eb2bedf9760c832330f207c63c1f533542478b6e148b0b13f7c15
   languageName: node
   linkType: hard
 

@@ -6,9 +6,8 @@ import type { FilterOptionsProps } from './FilterOptions';
 import {
   BooleanFilterOptions,
   DateFilterOptions,
-  NumberFilterOptions,
   SelectFilterOptions,
-  StringFilterOptions,
+  TextFilterOptions,
 } from './FilterOptions';
 import type { FieldType } from './types';
 
@@ -72,8 +71,8 @@ export const operations: Record<FieldType, Record<string, string>> = {
 };
 
 export const filterOptions: Record<FieldType, FC<FilterOptionsProps>> = {
-  number: NumberFilterOptions,
-  string: StringFilterOptions,
+  number: TextFilterOptions,
+  string: TextFilterOptions,
   date: DateFilterOptions,
   dateTime: DateFilterOptions,
   boolean: BooleanFilterOptions,
